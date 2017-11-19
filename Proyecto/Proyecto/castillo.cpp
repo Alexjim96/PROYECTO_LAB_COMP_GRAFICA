@@ -97,6 +97,7 @@ CTexture text2;
 CTexture text3;
 CTexture text4;
 CTexture text5;
+CTexture text6;
 CTexture t_arbusto;
 int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
@@ -338,6 +339,9 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	text5.LoadTGA("cuarto-p2.tga");
 	text5.BuildGLTexture();
 	text5.ReleaseImage();
+	text6.LoadTGA("cielo.tga");
+	text6.BuildGLTexture();
+	text6.ReleaseImage();
 	t_arbusto.LoadTGA("labe/arbusto.tga");
 	t_arbusto.BuildGLTexture();
 	t_arbusto.ReleaseImage();
@@ -568,10 +572,13 @@ void display(void)   // Creamos la funcion donde se dibuja
 	gluLookAt(objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z,
 		objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,
 		objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
-		glDisable(GL_LIGHTING);
-		fig6.skybox(1000, 1000, 1000, 0);
-		glEnable(GL_LIGHTING);
-		//glTranslatef(0,0,-90);
+		glPushMatrix();
+			glDisable(GL_LIGHTING);
+			glTranslatef(-50,45,0);
+			fig6.skybox(250, 100, 250, text6.GLindex);
+			glEnable(GL_LIGHTING);
+		glPopMatrix();
+		glTranslatef(-103,5,-90);
 		glTranslatef(10,3.0,-10.0);
 		glPushMatrix();
 		glTranslatef(110,-4.8,75);
@@ -672,7 +679,7 @@ void display(void)   // Creamos la funcion donde se dibuja
 			glPopMatrix();
 		glPopMatrix();
 		glPushMatrix();
-			glTranslatef(0, 10, 0);
+			glTranslatef(0, 10.05, 0);
 			//glColor3f(1.0, 1.0, 0.0);
 			fig4.cilindro(4.0, 8, 50, text2.GLindex);	//Torre central
 			//Dragon
@@ -873,9 +880,11 @@ void animacion()
 				play = false;
 			}
 			elev += 0.2;
+			objCamera.UpDown_Camera(CAMERASPEED/4);
 		}
 		else {
 			elev -= 0.2;
+			objCamera.UpDown_Camera(-CAMERASPEED / 4);
 			if (elev<=0) {
 				play = false;
 				bandera = false;
