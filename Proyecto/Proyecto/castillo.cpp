@@ -19,7 +19,18 @@
 #endif
 
 float elev=0;
-bool play=false,bandera=false;
+bool play=false,bandera=false,recorrido=false,fant=true;
+bool an = true;
+
+int i_max_steps = 100;
+int i_curr_steps = 0;
+int FrameIndex = 0;			//introducir datos
+int playIndex = 0;
+
+int frame = 0, time, timebase = 0;
+int j = 0, z = 0;
+float fanx=8, fany=-5, fanz=7.5;
+float fanr = 0;
 
 CTexture textMesa;
 CTexture textPata;
@@ -102,9 +113,130 @@ CTexture t_arbusto;
 int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 CModel dragon;
-
-
+CModel fantasma;
 CCamera objCamera;
+float avanzar = 0,rotar=0;
+
+float posz = -90, viewx=0;
+
+typedef struct _frame
+{
+	float posx;
+	float posz;
+	float viewx;
+	float viewz;
+	float posxInc;
+	float poszInc;
+	float viewxInc;
+	float viewzInc;
+}FRAME;
+
+FRAME KeyFrame[90];
+
+void InitGL(GLvoid)     // Inicializamos parametros
+{
+	//glShadeModel(GL_FLAT);							// Habilitamos Smooth Shading
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo
+														//glClearDepth(1.0f);									// Configuramos Depth Buffer
+														//glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
+														//glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
+	glShadeModel(GL_SMOOTH);
+	glLightfv(GL_LIGHT1, GL_POSITION, Position);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glEnable(GL_TEXTURE_2D);
+	glShadeModel(GL_SMOOTH);
+	glEnable(GL_COLOR_MATERIAL);
+
+	glClearDepth(1.0f);									// Configuramos Depth Buffer
+	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
+	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	glEnable(GL_AUTO_NORMAL);
+	glEnable(GL_NORMALIZE);
+
+	glEnable(GL_BLEND);
+
+	text1.LoadTGA("pared-pv.tga");
+	text1.BuildGLTexture();
+	text1.ReleaseImage();
+	text2.LoadTGA("pared.tga");
+	text2.BuildGLTexture();
+	text2.ReleaseImage();
+	text3.LoadTGA("pared-p.tga");
+	text3.BuildGLTexture();
+	text3.ReleaseImage();
+	text4.LoadTGA("cuarto-p.tga");
+	text4.BuildGLTexture();
+	text4.ReleaseImage();
+	text5.LoadTGA("cuarto-p2.tga");
+	text5.BuildGLTexture();
+	text5.ReleaseImage();
+	text6.LoadTGA("cielo.tga");
+	text6.BuildGLTexture();
+	text6.ReleaseImage();
+	t_arbusto.LoadTGA("labe/arbusto.tga");
+	t_arbusto.BuildGLTexture();
+	t_arbusto.ReleaseImage();
+	textMarble.LoadBMP("casa/marble_2.bmp");
+	textMarble.BuildGLTexture();
+	textMarble.ReleaseImage();
+	textAlmohada.LoadBMP("casa/almohada.bmp");
+	textAlmohada.BuildGLTexture();
+	textAlmohada.ReleaseImage();
+
+	textColcha.LoadBMP("casa/colcha.bmp");
+	textColcha.BuildGLTexture();
+	textColcha.ReleaseImage();
+	textMaderaCama.LoadBMP("casa/maderaCama.bmp");
+	textMaderaCama.BuildGLTexture();
+	textMaderaCama.ReleaseImage();
+
+	dragon._3dsLoad("Dragon.3ds");
+	fantasma._3dsLoad("fantasma.3ds");
+	for (int i = 0; i<90; i++)
+	{
+		KeyFrame[i].posx = 0;
+		KeyFrame[i].posz = 0;
+		KeyFrame[i].viewx = 0;
+		KeyFrame[i].viewz = 0;
+	}
+
+	/* setup blending */
+	glEnable(GL_BLEND);			// Turn Blending On
+	objCamera.Position_Camera(10, 2.5f, 20, 10, 2.5f, 10, 0, 1, 0);
+}
+
+
+void saveFrame(void)
+{
+	KeyFrame[0].posz = -90;
+	KeyFrame[0].viewx = 0;
+	FrameIndex++;
+	KeyFrame[1].posz = -40;
+	KeyFrame[1].viewx = 0;
+	FrameIndex++;
+	KeyFrame[2].posz = -40;
+	KeyFrame[2].viewx = -85;
+	FrameIndex++;
+	KeyFrame[3].posz = -10;
+	KeyFrame[3].viewx = 0;
+}
+
+void resetElements(void)
+{
+	posz = KeyFrame[0].posz;
+	viewx = KeyFrame[0].viewx;
+}
+
+void interpolation(void)
+{
+	KeyFrame[playIndex].poszInc = (KeyFrame[playIndex + 1].posz - KeyFrame[playIndex].posz) / i_max_steps;
+	KeyFrame[playIndex].viewxInc = (KeyFrame[playIndex + 1].viewx - KeyFrame[playIndex].viewx) / i_max_steps;
+}
 
 void mesa(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosMesa, GLfloat yPosMesa, GLfloat zPosMesa) {
 	//mesa	
@@ -294,76 +426,6 @@ void Cama(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosCama, G
 	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 	glPopMatrix();
-}
-
-
-void InitGL(GLvoid)     // Inicializamos parametros
-{
-	//glShadeModel(GL_FLAT);							// Habilitamos Smooth Shading
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);				// Negro de fondo
-														//glClearDepth(1.0f);									// Configuramos Depth Buffer
-														//glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
-														//glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
-	glShadeModel(GL_SMOOTH);
-	glLightfv(GL_LIGHT1, GL_POSITION, Position);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, Diffuse);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-
-	glEnable(GL_TEXTURE_2D);
-	glShadeModel(GL_SMOOTH);
-	glEnable(GL_COLOR_MATERIAL);
-
-	glClearDepth(1.0f);									// Configuramos Depth Buffer
-	glEnable(GL_DEPTH_TEST);							// Habilitamos Depth Testing
-	glDepthFunc(GL_LEQUAL);								// Tipo de Depth Testing a realizar
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	glEnable(GL_AUTO_NORMAL);
-	glEnable(GL_NORMALIZE);
-	
-	glEnable(GL_BLEND);
-
-	text1.LoadTGA("pared-pv.tga");
-	text1.BuildGLTexture();
-	text1.ReleaseImage();
-	text2.LoadTGA("pared.tga");
-	text2.BuildGLTexture();
-	text2.ReleaseImage();
-	text3.LoadTGA("pared-p.tga");
-	text3.BuildGLTexture();
-	text3.ReleaseImage();
-	text4.LoadTGA("cuarto-p.tga");
-	text4.BuildGLTexture();
-	text4.ReleaseImage();
-	text5.LoadTGA("cuarto-p2.tga");
-	text5.BuildGLTexture();
-	text5.ReleaseImage();
-	text6.LoadTGA("cielo.tga");
-	text6.BuildGLTexture();
-	text6.ReleaseImage();
-	t_arbusto.LoadTGA("labe/arbusto.tga");
-	t_arbusto.BuildGLTexture();
-	t_arbusto.ReleaseImage();
-	textMarble.LoadBMP("casa/marble_2.bmp");
-	textMarble.BuildGLTexture();
-	textMarble.ReleaseImage();
-	textAlmohada.LoadBMP("casa/almohada.bmp");
-	textAlmohada.BuildGLTexture();
-	textAlmohada.ReleaseImage();
-
-	textColcha.LoadBMP("casa/colcha.bmp");
-	textColcha.BuildGLTexture();
-	textColcha.ReleaseImage();
-	textMaderaCama.LoadBMP("casa/maderaCama.bmp");
-	textMaderaCama.BuildGLTexture();
-	textMaderaCama.ReleaseImage();
-
-	dragon._3dsLoad("Dragon.3ds");
-
-	/* setup blending */
-	glEnable(GL_BLEND);			// Turn Blending On
-	objCamera.Position_Camera(10, 2.5f, 20, 10, 2.5f, 10, 0, 1, 0);
 }
 
 void prisma(GLuint textura1)  //Funcion creacion prisma
@@ -568,17 +630,17 @@ void display(void)   // Creamos la funcion donde se dibuja
 	
 	glPushMatrix();
 	glRotatef(g_lookupdown, 1.0f, 0, 0);
-
+	glRotatef(viewx, 0, 1, 0);
 	gluLookAt(objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z,
 		objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,
 		objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
+		//glTranslatef(-103, 6, posz);
 		glPushMatrix();
-			glDisable(GL_LIGHTING);
-			glTranslatef(-50,45,0);
-			fig6.skybox(250, 100, 250, text6.GLindex);
-			glEnable(GL_LIGHTING);
+		glDisable(GL_LIGHTING);
+		glTranslatef(50, 30, 50);
+		fig6.skybox(250, 100, 250, text6.GLindex);
+		glEnable(GL_LIGHTING);
 		glPopMatrix();
-		glTranslatef(-103,5,-90);
 		glTranslatef(10,3.0,-10.0);
 		glPushMatrix();
 		glTranslatef(110,-4.8,75);
@@ -866,12 +928,215 @@ void display(void)   // Creamos la funcion donde se dibuja
 			glTranslatef(0,0,3.95);
 			fig5.prisma(0.5,7.7,12,text2.GLindex, text2.GLindex, text2.GLindex);
 		glPopMatrix();
+		//Fantasma
+		glPushMatrix();
+			glTranslatef(fanx, fany, fanz);
+			glScalef(0.002,0.002,0.002);
+			glRotatef(-45+fanr,0,1,0);
+			fantasma.GLrender(NULL, _SHADED, 1.0);
+		glPopMatrix();
 		glPopMatrix();
 	glutSwapBuffers();
 }
 
 void animacion()
 {
+	if (fant) {
+		if (fanx >= -8 && fany<=-5) {
+			fanr = 0;
+			fanx -= 0.1;
+		}
+		else if (fanx<=8 && fany <=5) {
+			fany += 0.1;
+		}
+		else if (fany >= 5 && fanz >= -7.5 && fanx <=8) {
+			fanr = -90;
+			fanz -= 0.1;
+		}
+		else if (fany>=5 && fanx<=8 ) {
+			fanr = -180;
+			fanx += 0.1;
+		}
+		else if (fany >= 5 && fanz <= 7.5 && fanx>=8) {
+			fanr = -270;
+			fanz += 0.1;
+		}
+		else if (fanx >= 8 && fany >= -5) {
+			fany -= 0.1;
+		}
+	}
+	if (recorrido) {
+		if (j < 40 && z <= 0) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2)/2);
+			j++;
+		}
+		else if (j >= 40 && z<47) {
+			objCamera.Rotate_View(-CAMERASPEED/2);
+			z++;
+		}
+		else if (j<74 && j>=40){
+			objCamera.Move_Camera((CAMERASPEED + 0.2)/2);
+			j++;
+		}
+		else if (z>=47 && z<94) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<95 && j >= 74) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 94 && z<141) {
+			objCamera.Rotate_View(-CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<115 && j >= 95) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 141 && z<148) {
+			objCamera.Rotate_View(-CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<140 && j >= 115) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 148 && z<202) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<175 && j >= 140) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 202 && z<247) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<180 && j >= 175) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (j<195 && j >= 180) {
+			j++;
+		}
+		else if (j<200 && j >= 195) {
+			objCamera.Move_Camera(-(CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 247 && z<292) {
+			objCamera.Rotate_View(-CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<204 && j >= 200) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 292 && z<339) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<211 && j >= 204) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 339 && z<420) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (z >= 420 && z<470) {
+			if (z<=420)
+			{
+				play = !play;
+			}
+			z++;
+		}
+		else if (j<215 && j >= 211) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 470 && z<521) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<219 && j >= 215) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (j<240 && j >= 219) {
+			j++;
+		}
+		else if (j<244 && j >= 240) {
+			objCamera.Move_Camera(-(CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 521 && z<555) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<248 && j >= 244) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 555 && z<650) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (z >= 650 && z<720) {
+			if (z <= 650)
+			{
+				play = !play;
+			}
+			z++;
+		}
+		else if (j<252 && j >= 248) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 700 && z<750) {
+			objCamera.Rotate_View(-CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<262 && j >= 252) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 750 && z<780) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<285 && j >= 262) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 780 && z<820) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<305 && j >= 285) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 820 && z<875) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else if (j<322 && j >= 305) {
+			objCamera.Move_Camera((CAMERASPEED + 0.2) / 2);
+			j++;
+		}
+		else if (z >= 875 && z<985) {
+			objCamera.Rotate_View(CAMERASPEED / 2);
+			z++;
+		}
+		else {
+			j = 0;
+			z = 0;
+			recorrido = false;
+		}
+	}
+
 	if (play)
 	{
 		if (elev <= 9.8 && bandera == false) {
@@ -926,6 +1191,30 @@ void keyboard(unsigned char key, int x, int y)
 	case 'S':
 		objCamera.Move_Camera(-((CAMERASPEED + 0.2)/3));
 		break;
+	case 'n':
+	case 'N':
+		posz += 1;
+		printf("nuevo dato\n");
+		printf("Posz= %f\n", posz);
+		break;
+	case 'm':
+	case 'M':
+		posz -= 1;
+		printf("nuevo dato\n");
+		printf("Posz= %f\n", posz);
+		break;
+	case 'k':
+	case 'K':
+		viewx += 1;
+		printf("nuevo dato\n");
+		printf("Roty= %f\n", viewx);
+		break;
+	case 'j':
+	case 'J':
+		viewx -= 1;
+		printf("nuevo dato\n");
+		printf("Roty= %f\n", viewx);
+		break;
 	case 'a':
 	case 'A':
 		objCamera.Strafe_Camera(-((CAMERASPEED + 0.4)/3));
@@ -942,6 +1231,31 @@ void keyboard(unsigned char key, int x, int y)
 	case 'P':
 		play= !play;
 		break;
+	case 'r':
+	case 'R':
+		recorrido = !recorrido;
+		break;
+	/*case 'l':
+	case 'L':
+		if (an == true) {
+			saveFrame();
+			an = false;
+		}
+		if (recorrido == false && (FrameIndex>1))
+		{
+			resetElements();
+			//First Interpolation				
+			interpolation();
+
+			recorrido = true;
+			playIndex = 0;
+			i_curr_steps = 0;
+		}
+		else
+		{
+			recorrido = false;
+		}
+		break;*/
 	case 27: exit(0);
 		break;
 	default:        // Cualquier otra
@@ -997,7 +1311,7 @@ void sonido() {
 
 int main(int argc, char** argv)   // Main Function
 {
-	//sonido();
+	sonido();
 	glutInit(&argc, argv); // Inicializamos OpenGL
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH); 
 	glutInitWindowSize(600, 600);	// Tamaño de la Ventana
