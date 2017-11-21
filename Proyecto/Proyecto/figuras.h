@@ -25,7 +25,7 @@ class CFiguras
 
 	void tecla(float altura, float largo, float profundidad, GLuint text);
 	//void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text );
-	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos);
+	void torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text);
 
 
 };

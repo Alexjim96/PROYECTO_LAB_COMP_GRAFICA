@@ -411,65 +411,66 @@ void CFiguras::esfera(GLfloat radio, int meridianos, int paralelos, GLuint text 
 	}
 }
 
-void CFiguras::torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos )
+void CFiguras::torus(GLfloat radioM, GLfloat radiom, int meridianos, int paralelos, GLuint text)
 {
 
 	float R = 0;
 	float r = 0;
 
-	float v1[]={0.0, 0.0, 0.0};
-	float v2[]={0.0, 0.0, 0.0};
-	float v3[]={0.0, 0.0, 0.0};
-	float v4[]={0.0, 0.0, 0.0};
+	float v1[] = { 0.0, 0.0, 0.0 };
+	float v2[] = { 0.0, 0.0, 0.0 };
+	float v3[] = { 0.0, 0.0, 0.0 };
+	float v4[] = { 0.0, 0.0, 0.0 };
 
-	int i,j;
+	int i, j;
+	glBindTexture(GL_TEXTURE_2D, text);   // choose the texture to use.
+	GLdouble angulop = 2 * 3.1415 / paralelos;
+	GLdouble angulom = 2 * 3.1415 / meridianos;
 
-	GLdouble angulop = 2*3.1415/paralelos;
-	GLdouble angulom = 2*3.1415/meridianos;
-
-	r = (radioM - radiom)/2;
+	r = (radioM - radiom) / 2;
 	R = radiom + r;
 
-	for(i=0;i<meridianos;i++)
+	for (i = 0; i<meridianos; i++)
 	{
-		for(j=0;j<paralelos;j++)
+		for (j = 0; j<paralelos; j++)
 		{
-			
-			v1[0]=R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*j);
-			v1[2]=R*sin(angulom*i)+ r*sin(angulom*i)*cos(angulop*j);
-			v1[1]=r*sin(angulop*j);
+
+			v1[0] = R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*j);
+			v1[2] = R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*j);
+			v1[1] = r*sin(angulop*j);
 
 			glNormal3f(v1[0], v1[1], v1[2]);
-			
-			v2[0]=R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*(j+1));
-			v2[2]=R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*(j+1));
-			v2[1]=r*sin(angulop*(j+1));
+
+			v2[0] = R*cos(angulom*i) + r*cos(angulom*i)*cos(angulop*(j + 1));
+			v2[2] = R*sin(angulom*i) + r*sin(angulom*i)*cos(angulop*(j + 1));
+			v2[1] = r*sin(angulop*(j + 1));
 
 			glNormal3f(v2[0], v2[1], v2[2]);
 
-			v3[0]=R*cos(angulom*(i+1)) + r*cos(angulom*(i+1))*cos(angulop*(j+1));
-			v3[2]=R*sin(angulom*(i+1)) + r*sin(angulom*(i+1))*cos(angulop*(j+1));
-			v3[1]=r*sin(angulop*(j+1));
+			v3[0] = R*cos(angulom*(i + 1)) + r*cos(angulom*(i + 1))*cos(angulop*(j + 1));
+			v3[2] = R*sin(angulom*(i + 1)) + r*sin(angulom*(i + 1))*cos(angulop*(j + 1));
+			v3[1] = r*sin(angulop*(j + 1));
 
 			glNormal3f(v3[0], v3[1], v3[2]);
 
-			v4[0]=R*cos(angulom*(i+1)) + r*cos(angulom*(i+1))*cos(angulop*j);
-			v4[2]=R*sin(angulom*(i+1)) + r*sin(angulom*(i+1))*cos(angulop*j);
-			v4[1]=r*sin(angulop*j);
+			v4[0] = R*cos(angulom*(i + 1)) + r*cos(angulom*(i + 1))*cos(angulop*j);
+			v4[2] = R*sin(angulom*(i + 1)) + r*sin(angulom*(i + 1))*cos(angulop*j);
+			v4[1] = r*sin(angulop*j);
 
 			glNormal3f(v4[0], v4[1], v4[2]);
-			
-			
+
+
 			//glBegin(GL_LINE_LOOP);
 			glBegin(GL_POLYGON);
-				glVertex3fv(v1);
-				glVertex3fv(v2);
-				glVertex3fv(v3);
-				glVertex3fv(v4);
+			glVertex3fv(v1);
+			glVertex3fv(v2);
+			glVertex3fv(v3);
+			glVertex3fv(v4);
 			glEnd();
 		}
 	}
 }
+
 
 void CFiguras::cono(float altura, float radio, int resolucion, GLuint text)
 {
