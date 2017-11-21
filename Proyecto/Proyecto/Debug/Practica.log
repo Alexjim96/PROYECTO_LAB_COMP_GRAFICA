@@ -1,0 +1,4 @@
+﻿  castillo.cpp
+c:\users\alejandro\desktop\practica\practica\castillo.cpp(9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Practica.vcxproj -> C:\Users\Alejandro\Desktop\practica\Debug\Practica.exe
+  Practica.vcxproj -> C:\Users\Alejandro\Desktop\practica\Debug\Practica.pdb (Partial PDB)

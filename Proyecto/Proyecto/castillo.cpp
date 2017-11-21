@@ -21,87 +21,36 @@
 float elev=0;
 bool play=false,bandera=false,recorrido=false,fant=true;
 bool an = true;
+bool play2 = false;
 
 int i_max_steps = 100;
 int i_curr_steps = 0;
 int FrameIndex = 0;			//introducir datos
 int playIndex = 0;
-
+int estado=0;
 int frame = 0, time, timebase = 0;
 int j = 0, z = 0;
 float fanx=8, fany=-5, fanz=7.5;
 float fanr = 0;
+float gAnim = 0, gY = 0, traY=0, traX=0 , fantY=0;
+
 
 CTexture textMesa;
 CTexture textPata;
-CTexture textWall;
-CTexture textSilla;
-CTexture textTecho;
 CTexture textMarble;
-CTexture textPiso;
-CTexture textGlassWasser;
-CTexture textBarrote;
-CTexture textCuadro1;
-CTexture textMarco;
-CTexture textLibroCG;
-CTexture textPB;
 CTexture textPuerta;
 CTexture textPuerta_princ;
-CTexture textMarco_1;
-CTexture textMarco_2;
-CTexture textMarco_3;
-CTexture textGrass;
-CTexture textSky;
-CTexture textLibrero;
+//para el cuarto de tortura
+CTexture t_met;
+CTexture t_met1;
+CTexture t_metSilla;
+CTexture t_metPico;
+CTexture t_baseC;
 
-CFiguras tablaMesa;
-CFiguras pata1Mesa;
-CFiguras pata2Mesa;
-CFiguras pata3Mesa;
-CFiguras pata4Mesa;
-CFiguras asientoSilla;
-CFiguras respaldoSilla1;
-CFiguras respaldoSilla2;
-CFiguras respaldoSilla3;
-CFiguras respaldoSilla4;
-CFiguras techoCasa;
-CFiguras pisoCasa;
-
-CFiguras cama;
-CFiguras buro;
-CFiguras cono;
-CFiguras lampara;
-CFiguras laptop;
-CFiguras cubo;
-
-//***ROSE****
+//para muebles
 CTexture textAlmohada;
 CTexture textColcha;
-CTexture textMaderaBuro;
 CTexture textMaderaCama;
-CTexture textLampara;
-CTexture textLaptop;
-CTexture textPantalla;
-CTexture textTeclado;
-CTexture textTouchPad;
-CTexture textGW;
-
-bool cancion = true;
-void sonido();
-int i;
-GLfloat Diffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
-GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
-GLfloat Position[] = { 0.0f, 27.0f, -5.0f, 0.0f };			// Light Position
-GLfloat Position2[] = { 0.0f, 0.0f, -5.0f, 1.0f };			// Light Position
-
-GLfloat g_lookupdown = 0.0f;
-
-CFiguras fig1;
-CFiguras fig2;
-CFiguras fig3;
-CFiguras fig4;	
-CFiguras fig5;	
-CFiguras fig6;
 
 CTexture text1;
 CTexture text2;
@@ -110,11 +59,51 @@ CTexture text4;
 CTexture text5;
 CTexture text6;
 CTexture t_arbusto;
+CTexture pasto;
+
+bool cancion = true;
+void sonido();
+int i;
+int aux=0;
+
+//para camara de Tortura
+
+float clavH = 0, clavV = 0;
+int flagAux = 1, cadenas = 0;
+
+//iluminacion
+GLfloat Diffuse[] = { 0.5f, 0.5f, 0.5f, 1.0f };				// Diffuse Light Values
+GLfloat Specular[] = { 1.0, 1.0, 1.0, 1.0 };				// Specular Light Values
+GLfloat Position[] = { 0.0f, 27.0f, -5.0f, 0.0f };			// Light Position
+GLfloat Position2[] = { 0.0f, 0.0f, -5.0f, 1.0f };			// Light Position
+
+GLfloat g_lookupdown = 0.0f;
+//para los muebles
+CFiguras tablaMesa;
+CFiguras pata1Mesa;
+CFiguras pata2Mesa;
+CFiguras pata3Mesa;
+CFiguras pata4Mesa;
+CFiguras cama;
+
+CFiguras fig1;
+CFiguras fig2;
+CFiguras fig3;
+CFiguras fig4;	
+CFiguras fig5;	
+CFiguras fig6;
+CFiguras fig7;
+
+
 int font = (int)GLUT_BITMAP_TIMES_ROMAN_24;
 
 CModel dragon;
 CModel fantasma;
+CModel cabeza2;
+CModel fant2;
+
 CCamera objCamera;
+
 float avanzar = 0,rotar=0;
 
 float posz = -90, viewx=0;
@@ -163,27 +152,64 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	text1.LoadTGA("pared-pv.tga");
 	text1.BuildGLTexture();
 	text1.ReleaseImage();
+
 	text2.LoadTGA("pared.tga");
 	text2.BuildGLTexture();
 	text2.ReleaseImage();
+
 	text3.LoadTGA("pared-p.tga");
 	text3.BuildGLTexture();
 	text3.ReleaseImage();
+
 	text4.LoadTGA("cuarto-p.tga");
 	text4.BuildGLTexture();
 	text4.ReleaseImage();
+
 	text5.LoadTGA("cuarto-p2.tga");
 	text5.BuildGLTexture();
 	text5.ReleaseImage();
+
 	text6.LoadTGA("cielo.tga");
 	text6.BuildGLTexture();
 	text6.ReleaseImage();
+
+	pasto.LoadTGA("pasto.tga");
+	pasto.BuildGLTexture();
+	pasto.ReleaseImage();
+
 	t_arbusto.LoadTGA("labe/arbusto.tga");
 	t_arbusto.BuildGLTexture();
 	t_arbusto.ReleaseImage();
+
+	t_met.LoadTGA("cuartoTortura/metalOxi2.tga");
+	t_met.BuildGLTexture();
+	t_met.ReleaseImage();
+
+	t_met1.LoadTGA("cuartoTortura/metalOxi.tga");
+	t_met1.BuildGLTexture();
+	t_met1.ReleaseImage();
+
+	t_metPico.LoadTGA("cuartoTortura/metalPicos.tga");
+	t_metPico.BuildGLTexture();
+	t_metPico.ReleaseImage();
+
+	t_metSilla.LoadTGA("cuartoTortura/metalViejo.tga");
+	t_metSilla.BuildGLTexture();
+	t_metSilla.ReleaseImage();
+
+	t_baseC.LoadTGA("cuartoTortura/madera_oscura.tga");
+	t_baseC.BuildGLTexture();
+	t_baseC.ReleaseImage();
+
+	cabeza2._3dsLoad("cuartoTortura/face.3ds");
+	/*cabeza2.LoadTextureImages();
+	cabeza2.GLIniTextures();
+	cabeza2.ReleaseTextureImages();*/
+
 	textMarble.LoadBMP("casa/marble_2.bmp");
 	textMarble.BuildGLTexture();
 	textMarble.ReleaseImage();
+
 	textAlmohada.LoadBMP("casa/almohada.bmp");
 	textAlmohada.BuildGLTexture();
 	textAlmohada.ReleaseImage();
@@ -191,12 +217,20 @@ void InitGL(GLvoid)     // Inicializamos parametros
 	textColcha.LoadBMP("casa/colcha.bmp");
 	textColcha.BuildGLTexture();
 	textColcha.ReleaseImage();
+
 	textMaderaCama.LoadBMP("casa/maderaCama.bmp");
 	textMaderaCama.BuildGLTexture();
 	textMaderaCama.ReleaseImage();
 
+	fant2._3dsLoad("cuartoTortura/cabezaAsusta.3ds");
+	fant2.LoadTextureImages();
+	fant2.GLIniTextures();
+	fant2.ReleaseTextureImages();
+
 	dragon._3dsLoad("Dragon.3ds");
+
 	fantasma._3dsLoad("fantasma.3ds");
+	
 	for (int i = 0; i<90; i++)
 	{
 		KeyFrame[i].posx = 0;
@@ -268,163 +302,163 @@ void mesa(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosMesa, G
 void Cama(GLfloat xMadera, GLfloat yMadera, GLfloat zMadera, GLfloat xPosCama, GLfloat yPosCama, GLfloat zPosCama)
 {
 	glPushMatrix();
-	glScalef(xMadera, yMadera, zMadera); //posicion y tamaño 
+		glScalef(xMadera, yMadera, zMadera); //posicion y tamaño 
 	glTranslatef(xPosCama, yPosCama, zPosCama); //figura 
 
 												//dibujamos la cabecera
 	glPushMatrix();
-	glTranslatef(9.0, 1.5, 0.5);
-	glScalef(18.0, 3.0, 1.0);  //Tamaño de cabecera
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 1.5, 0.5);
+		glScalef(18.0, 3.0, 1.0);  //Tamaño de cabecera
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, 6.0, 0.5);
-	glScalef(1.0, 6.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(0.5, 6.0, 0.5);
+		glScalef(1.0, 6.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(4.0, 6.0, 0.5);
-	glScalef(4.0, 6.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(4.0, 6.0, 0.5);
+		glScalef(4.0, 6.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(9.0, 6.0, 0.5);
-	glScalef(4.0, 6.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 6.0, 0.5);
+		glScalef(4.0, 6.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(14.0, 6.0, 0.5);
-	glScalef(4.0, 6.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(14.0, 6.0, 0.5);
+		glScalef(4.0, 6.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, 6.0, 0.5);
-	glScalef(1.0, 6.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(17.5, 6.0, 0.5);
+		glScalef(1.0, 6.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(9.0, 9.5, 0.5);
-	glScalef(18.0, 1.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 9.5, 0.5);
+		glScalef(18.0, 1.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, 5.0, 0.5);
-	glScalef(1.0, 10.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(0.5, 5.0, 0.5);
+		glScalef(1.0, 10.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 
 	//dibujamos la base de la cama
 	glPushMatrix();
-	glTranslatef(0.5, 1.0, 11.0);
-	glScalef(1.0, 2.0, 22.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(0.5, 1.0, 11.0);
+		glScalef(1.0, 2.0, 22.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, 1.0, 11.0);
-	glScalef(1.0, 2.0, 22.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(17.5, 1.0, 11.0);
+		glScalef(1.0, 2.0, 22.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(9.0, 1.0, 21.5);
-	glScalef(18.0, 2.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 1.0, 21.5);
+		glScalef(18.0, 2.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 
 	//colchon
 	glPushMatrix();
-	glTranslatef(9.0, 3.5, 11.0);
-	glScalef(18.0, 3.0, 20.0);
-	cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
+		glTranslatef(9.0, 3.5, 11.0);
+		glScalef(18.0, 3.0, 20.0);
+		cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, 3.5, 11.0);
-	glScalef(1.0, 3.0, 20.0);
-	cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
+		glTranslatef(0.5, 3.5, 11.0);
+		glScalef(1.0, 3.0, 20.0);
+		cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, 3.5, 11.0);
-	glScalef(1.0, 3.0, 20.0);
-	cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
+		glTranslatef(17.5, 3.5, 11.0);
+		glScalef(1.0, 3.0, 20.0);
+		cama.prisma(1.0, 1.0, 1.0, textColcha.GLindex, textColcha.GLindex, textColcha.GLindex);
 	glPopMatrix();
 
 	//almohada izquierda
 	glPushMatrix();
-	glTranslatef(4.0, 5.5, 3.0);
-	glScalef(8.0, 1.0, 4.0);
-	cama.prisma(1.0, 1.0, 1.0, textAlmohada.GLindex, textAlmohada.GLindex, textAlmohada.GLindex);
+		glTranslatef(4.0, 5.5, 3.0);
+		glScalef(8.0, 1.0, 4.0);
+		cama.prisma(1.0, 1.0, 1.0, textAlmohada.GLindex, textAlmohada.GLindex, textAlmohada.GLindex);
 	glPopMatrix();
 
 	//almohada derecha
 	glPushMatrix();
-	glTranslatef(14.0, 5.5, 3.0);
-	glScalef(8.0, 1.0, 4.0);
-	cama.prisma(1.0, 1.0, 1.0, textAlmohada.GLindex, textAlmohada.GLindex, textAlmohada.GLindex);
+		glTranslatef(14.0, 5.5, 3.0);
+		glScalef(8.0, 1.0, 4.0);
+		cama.prisma(1.0, 1.0, 1.0, textAlmohada.GLindex, textAlmohada.GLindex, textAlmohada.GLindex);
 	glPopMatrix();
 
 
 	//enfrente
 	glPushMatrix();
-	glTranslatef(9.0, 6.5, 21.5);
-	glScalef(16.0, 1.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 6.5, 21.5);
+		glScalef(16.0, 1.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(9.0, 2.5, 21.5);
-	glScalef(16.0, 5.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(9.0, 2.5, 21.5);
+		glScalef(16.0, 5.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, 4.0, 21.5);
-	glScalef(1.0, 8.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(0.5, 4.0, 21.5);
+		glScalef(1.0, 8.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, 4.0, 21.5);
-	glScalef(1.0, 8.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(17.5, 4.0, 21.5);
+		glScalef(1.0, 8.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 
 	//patas
 	glPushMatrix();
-	glTranslatef(0.5, -1.0, 21.5);
-	glScalef(1.0, 2.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(0.5, -1.0, 21.5);
+		glScalef(1.0, 2.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, -1.0, 21.5);
-	glScalef(1.0, 2.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(17.5, -1.0, 21.5);
+		glScalef(1.0, 2.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(17.5, -1.0, 0.5);
-	glScalef(1.0, 2.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glTranslatef(17.5, -1.0, 0.5);
+		glScalef(1.0, 2.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(0.5, -1.0, 0.5);
-	glScalef(1.0, 2.0, 1.0);
-	cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
-	glPopMatrix();
+		glTranslatef(0.5, -1.0, 0.5);
+		glScalef(1.0, 2.0, 1.0);
+		cama.prisma(1.0, 1.0, 1.0, textMaderaCama.GLindex, textMaderaCama.GLindex, textMaderaCama.GLindex);
+		glPopMatrix();
 	glPopMatrix();
 }
 
@@ -622,6 +656,426 @@ void laberinto() {
 		glPopMatrix();
 	glPopMatrix();
 }
+void camaTortura(GLfloat x, GLfloat y, GLfloat z, GLfloat xPos, GLfloat yPos, GLfloat zPos) {
+	
+	glPushMatrix();
+		//posicion y tamaño 
+		glScalef(x, y, z);
+		glTranslatef(xPos, yPos, zPos); 
+		// cabecera
+		glPushMatrix();
+			glTranslatef(9.0, 1.5, 0.5);
+			glScalef(18.0, 3.0, 1.0); 
+			fig7.prisma(1.0, 1.0, 1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+		
+		glPushMatrix(); 
+			glTranslatef(0.5,6.0,0.5);
+			glScalef(1.0,6.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(4.0,6.0,0.5);
+			glScalef(4.0,6.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(9.0,6.0,0.5);
+			glScalef(4.0,6.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(14.0,6.0,0.5);
+			glScalef(4.0,6.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(17.5,6.0,0.5);
+			glScalef(1.0,6.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(9.0,9.5,0.5);
+			glScalef(18.0,1.0,1.0);  
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(0.5,5.0,0.5);
+			glScalef(1.0,10.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+		//dibujamos la base de la cama
+		glPushMatrix(); 
+			glTranslatef(0.5,1.0,11.0);
+			glScalef(1.0,2.0,22.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(17.5,1.0,11.0);
+			glScalef(1.0,2.0,22.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(9.0,1.0,21.5);
+			glScalef(18.0,2.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+		//base de clavos
+		glPushMatrix(); 
+			glTranslatef(9.0,3.0,11.0);
+			glScalef(18.0,3.0,20.0);
+			fig7.prisma(1.0,1.0,1.0, t_met1.GLindex, t_met1.GLindex, t_met1.GLindex);
+		glPopMatrix();
+		
+		glPushMatrix();//clavos
+			glTranslatef(-0.5,4.0,2.0);
+			for (clavH = 0; clavH < 18.0; clavH++) {//picos horizontales
+				glTranslatef(1.0, 0.0, 0.0);
+				for (clavV = 0.0; clavV < 18.0; clavV+=1.0) {//picos verticales
+					if (flagAux %2!=0) {
+						glTranslatef(0.0, 0.0,1.0);
+						fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+					}
+					else {
+						glTranslatef(0.0, 0.0,-1.0);
+						fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+					}
+
+				}
+				if (flagAux % 2 != 0) {
+					glTranslatef(0.0, 0.0, 1.0);
+				}
+				else {
+					glTranslatef(0.0, 0.0, -1.0);
+				}
+					
+				flagAux++;
+			
+				
+			}
+			
+		glPopMatrix();
+
+		
+		//enfrente
+		glPushMatrix(); 
+			glTranslatef(9.0,6.5,21.5);
+			glScalef(16.0,1.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(9.0,2.5,21.5);
+			glScalef(16.0,5.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(0.5,4.0,21.5);
+			glScalef(1.0,8.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(17.5,4.0,21.5);
+			glScalef(1.0,8.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		//patas
+		glPushMatrix(); 
+			glTranslatef(0.5,-1.0,21.5);
+			glScalef(1.0,2.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(17.5,-1.0,21.5);
+			glScalef(1.0,2.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(17.5,-1.0,0.5);
+			glScalef(1.0,2.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+
+		glPushMatrix(); 
+			glTranslatef(0.5,-1.0,0.5);
+			glScalef(1.0,2.0,1.0);
+			fig7.prisma(1.0,1.0,1.0, t_met.GLindex, t_met.GLindex, t_met.GLindex);
+		glPopMatrix();
+	glPopMatrix();
+	
+
+
+
+}
+void sillaTortuta(GLfloat x, GLfloat y, GLfloat z, GLfloat lar, GLfloat alt, GLfloat anch) {
+	glPushMatrix();
+		glTranslatef(x,y,z);
+		glScalef(lar,alt,anch);
+		glPushMatrix();//silla
+			glTranslatef(3.4, -2.0, 0.0);
+			glScalef(1.5, 0.3, 2.0);
+			prisma(t_metSilla.GLindex);
+			//clavos
+			glPushMatrix();
+				glTranslatef(-0.5, 0.5, -0.47);
+				glScalef(0.06,0.5,0.10);
+				for (clavH = 0; clavH < 14.0; clavH++) {//picos horizontales
+					glTranslatef(1.0, 0.0, 0.0);
+					for (clavV = 0.0; clavV < 9.0; clavV += 1.0) {//picos verticales
+						if (flagAux % 2 != 0) {
+							glTranslatef(0.0, 0.0, 1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+						else {
+							glTranslatef(0.0, 0.0, -1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+
+					}
+					if (flagAux % 2 != 0) {
+						glTranslatef(0.0, 0.0, 1.0);
+					}
+					else {
+						glTranslatef(0.0, 0.0, -1.0);
+					}
+
+					flagAux++;
+
+
+				}
+
+			glPopMatrix();
+		glPopMatrix();
+
+		glPushMatrix();//respaldo
+			glTranslatef(4.1, -0.6, 0.0);
+			glScalef(0.1, 2.5, 2.0);
+			prisma(t_metSilla.GLindex);
+			//clavos
+			glPushMatrix();
+				glTranslatef(-0.5, -0.5, -0.47);
+				glRotatef(90.0, 0.0, 0.0, 1.0);
+				glScalef(0.05, 0.5, 0.05);
+				for (clavH = 0; clavH < 18.0; clavH++) {//picos horizontales
+					glTranslatef(1.0, 0.0, 0.0);
+					for (clavV = 0.0; clavV < 18.0; clavV += 1.0) {//picos verticales
+						if (flagAux % 2 != 0) {
+							glTranslatef(0.0, 0.0, 1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+						else {
+							glTranslatef(0.0, 0.0, -1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+
+					}
+					if (flagAux % 2 != 0) {
+						glTranslatef(0.0, 0.0, 1.0);
+					}
+					else {
+						glTranslatef(0.0, 0.0, -1.0);
+					}
+
+					flagAux++;
+
+
+				}
+
+			glPopMatrix();
+		glPopMatrix();
+		
+		glPushMatrix();//recargaderaIzq
+			glTranslatef(3.3, -0.5, 0.8);
+			glScalef(1.5, 0.2, 0.4);
+			prisma(t_metSilla.GLindex);
+			//clavos
+			glPushMatrix();
+				glTranslatef(-0.5, 0.5, -0.47);
+				glScalef(0.05, 0.2, 0.15);
+				for (clavH = 0; clavH < 18.0; clavH++) {//picos horizontales
+					glTranslatef(1.0, 0.0, 0.0);
+					for (clavV = 0.0; clavV < 5.0; clavV += 1.0) {//picos verticales
+						if (flagAux % 2 != 0) {
+							glTranslatef(0.0, 0.0, 1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+						else {
+							glTranslatef(0.0, 0.0, -1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+
+					}
+					if (flagAux % 2 != 0) {
+						glTranslatef(0.0, 0.0, 1.0);
+					}
+					else {
+						glTranslatef(0.0, 0.0, -1.0);
+					}
+
+					flagAux++;
+
+
+				}
+
+			glPopMatrix();
+		glPopMatrix();
+
+		glPushMatrix();//baseIzq
+			glTranslatef(3.1, -1.22, 0.8);
+			glScalef(0.2, 1.25, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//baseDer
+			glTranslatef(3.1, -1.22, -0.8);
+			glScalef(0.2, 1.25, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//recargaderaDer
+			glTranslatef(3.3, -0.5, -0.8);
+			glScalef(1.5, 0.2, 0.4);
+			prisma(t_metSilla.GLindex);
+			//clavos
+			glPushMatrix();
+				glTranslatef(-0.5, 0.5, -0.47);
+				glScalef(0.05, 0.2, 0.15);
+				for (clavH = 0; clavH < 18.0; clavH++) {//picos horizontales
+					glTranslatef(1.0, 0.0, 0.0);
+					for (clavV = 0.0; clavV < 5.0; clavV += 1.0) {//picos verticales
+						if (flagAux % 2 != 0) {
+							glTranslatef(0.0, 0.0, 1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+						else {
+							glTranslatef(0.0, 0.0, -1.0);
+							fig7.cono(2.5, 0.5, 20, t_metPico.GLindex);
+						}
+
+					}
+					if (flagAux % 2 != 0) {
+						glTranslatef(0.0, 0.0, 1.0);
+					}
+					else {
+						glTranslatef(0.0, 0.0, -1.0);
+					}
+
+					flagAux++;
+
+
+				}
+
+			glPopMatrix();
+		glPopMatrix();
+
+		glPushMatrix();//recargadera
+			glTranslatef(3.3, -0.5, -0.8);
+			glScalef(1.5, 0.2, 0.4);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//pata1 silla
+			glTranslatef(3.0, -3.2, 0.7);
+			glScalef(0.2, 2.3, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//pata2 silla
+			glTranslatef(4.0, -3.2, 0.7);
+			glScalef(0.2, 2.3, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//pata3 silla
+			glTranslatef(4.0, -3.2, -0.7);
+			glScalef(0.2, 2.3, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+
+		glPushMatrix();//pata4 silla
+			glTranslatef(3.0, -3.2, -0.7);
+			glScalef(0.2, 2.3, 0.2);
+			prisma(t_metSilla.GLindex);
+		glPopMatrix();
+	glPopMatrix();
+
+
+}
+
+void repertorioCabezas(GLfloat x, GLfloat y, GLfloat z, GLfloat larg, GLfloat alt, GLfloat anch) {
+	glPushMatrix();
+		glTranslatef(x, y, z);
+		glScalef(larg,alt,anch);
+		glPushMatrix();//cadenas lado izq
+			glRotatef(45,0.0,0.0,1.0);
+			glScalef(0.1,0.1,0.1);
+			for (cadenas = 0; cadenas < 10; cadenas++) {
+				glTranslatef(1.8,0.0,0.0);
+				if (cadenas % 2 == 0) {
+					glRotatef(30,1.0,0.0,0.0);
+					fig7.torus(1.5, 1.0, 50, 50,t_met.GLindex);
+				}else
+					fig7.torus(1.5, 1.0, 50, 50, t_met.GLindex);
+			
+			}
+		glPopMatrix();
+		glPushMatrix();//cadenas lado der
+		
+			glTranslatef(0.0,0.0,2.0);
+			glRotatef(45, 0.0, 0.0, 1.0);
+			glScalef(0.1, 0.1, 0.1);
+			for (cadenas = 0; cadenas < 10; cadenas++) {
+				glTranslatef(1.8, 0.0, 0.0);
+				if (cadenas % 2 == 0) {
+					glRotatef(30, 1.0, 0.0, 0.0);
+					fig7.torus(1.5, 1.0, 50, 50, t_met.GLindex);
+					
+				}
+				else
+					fig7.torus(1.5, 1.0, 50, 50,t_met.GLindex);
+				
+
+			}
+		glPopMatrix();
+		glPushMatrix();//tabla
+			glTranslatef(0.7,-0.1,1.0);
+			fig7.prisma(0.3,1.3,3.0, t_baseC.GLindex, t_baseC.GLindex, t_baseC.GLindex);
+			glPushMatrix(); //Cabeza1
+				glTranslatef(0.0, -0.1, 0.4);
+				glRotatef(-80, 0.0, 1.0, 0.0);
+				glScalef(0.06, 0.06, 0.06);
+				cabeza2.GLrender(NULL, _SHADED, 1);
+			glPopMatrix();
+			/*glPushMatrix(); //Cabeza2
+				glRotatef(-150, 0.0, 1.0, 0.0);
+				glTranslatef(-0.4,0.3,0.4);
+				glRotatef(-80, 0.0, 0.0, 1.0);
+				glScalef(0.06, 0.06, 0.06);
+				cabeza2.GLrender(NULL, _SHADED, 1);
+			glPopMatrix();*/
+
+			
+		glPopMatrix();
+
+		
+		
+
+	glPopMatrix();
+
+}
 
 void display(void)   // Creamos la funcion donde se dibuja
 {
@@ -634,28 +1088,32 @@ void display(void)   // Creamos la funcion donde se dibuja
 	gluLookAt(objCamera.mPos.x, objCamera.mPos.y, objCamera.mPos.z,
 		objCamera.mView.x, objCamera.mView.y, objCamera.mView.z,
 		objCamera.mUp.x, objCamera.mUp.y, objCamera.mUp.z);
-		//glTranslatef(-103, 6, posz);
+		glTranslatef(-103, 6, posz);
 		glPushMatrix();
-		glDisable(GL_LIGHTING);
-		glTranslatef(50, 30, 50);
-		fig6.skybox(250, 100, 250, text6.GLindex);
-		glEnable(GL_LIGHTING);
+			glDisable(GL_LIGHTING);
+			glTranslatef(50, 30, 50);
+			fig6.skybox(250, 100, 250, text6.GLindex);
+			glEnable(GL_LIGHTING);
 		glPopMatrix();
-		glTranslatef(10,3.0,-10.0);
-		glPushMatrix();
-		glTranslatef(110,-4.8,75);
-		glScalef(15,6,10);
-		laberinto();
+		glPushMatrix();//dibuja base
+			glTranslatef(0.0,-8.8,0.0);
+			fig6.prisma(2,250,250,pasto.GLindex, pasto.GLindex, pasto.GLindex);
+		glPopMatrix();
+		glTranslatef(10,3.0,-10.0);//dibuja laberinto
+			glPushMatrix();
+			glTranslatef(110,-5.0,75);
+			glScalef(15,6,10);
+			laberinto();
 		glPopMatrix();
 		glPushMatrix();
-		fig1.prisma(20,20,20,text1.GLindex,text2.GLindex,text2.GLindex);	//Edificio principal
+			fig1.prisma(20,20,20,text1.GLindex,text2.GLindex,text2.GLindex);	//Edificio principal
 		glPopMatrix();
 		glPushMatrix();
-		glTranslatef(19.1, -2.5, -2.0);
+			glTranslatef(19.1, -2.5, -2.0);
 			//glColor3f(0.0, 0.0, 1.0);
 			glPushMatrix();
-			glRotatef(90, 0, 1, 0);
-			fig2.prisma(16, 15, 18, text3.GLindex, text2.GLindex, text2.GLindex);		//Edificio derecho
+				glRotatef(90, 0, 1, 0);
+				fig2.prisma(16, 15, 18, text3.GLindex, text2.GLindex, text2.GLindex);		//Edificio derecho
 			glPopMatrix();	
 			//Cuadros de contorno en el edicio de la derecha
 			for (i = 0; i < 18; i+=3)
@@ -687,34 +1145,55 @@ void display(void)   // Creamos la funcion donde se dibuja
 			glTranslatef(-19.1, -2.5, -2.0);
 			//glColor3f(0.0, 1.0, 0.0);
 			glPushMatrix();
-			glRotatef(-90,0,1,0);
-			fig2.prisma(16, 15, 18, text3.GLindex, text2.GLindex, text2.GLindex);	//Edificio Izquierdo
+				glRotatef(-90,0,1,0);
+				fig2.prisma(16, 15, 18, text3.GLindex, text2.GLindex, text2.GLindex);	//Edificio Izquierdo
 			glPopMatrix();
 			//Cuadros de contorno en el edicio izquierdo
 			for (i = 0; i < 18; i += 3)
 			{
 				glPushMatrix();
-				glTranslatef(-7.5 + i, 9, 7);
-				//glColor3f(0.0, 1.0, 1.0);
-				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+					glTranslatef(-7.5 + i, 9, 7);
+					//glColor3f(0.0, 1.0, 1.0);
+					fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 				glPopMatrix();
 			}
 			for (i = 3; i < 15; i += 3)
 			{
 				glPushMatrix();
-				glTranslatef(-7.5, 9, 7.5 - i);
-				//glColor3f(0.0, 1.0, 1.0);
-				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+					glTranslatef(-7.5, 9, 7.5 - i);
+					//glColor3f(0.0, 1.0, 1.0);
+					fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 				glPopMatrix();
 			}
 			for (i = 0; i < 18; i += 3)
 			{
 				glPushMatrix();
-				glTranslatef(7.5 - i, 9, -7);
-				//glColor3f(0.0, 1.0, 1.0);
-				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+					glTranslatef(7.5 - i, 9, -7);
+					//glColor3f(0.0, 1.0, 1.0);
+					fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 				glPopMatrix();
 			}
+			glPushMatrix();
+				glTranslatef(0.0, traY, 0.0);
+				glRotatef(gAnim, 0.0, 1.0, 0.0);
+				glRotatef(gY,0.0,1.0,0.0);
+				camaTortura(0.2, 0.2, 0.2, 20.0, -38.0, -20.0);
+				sillaTortuta(-2.0, -4.5, 5.0, 0.8, 0.7, 0.8);
+			glPopMatrix();
+			glPushMatrix();
+				if (play2) {
+				
+				glTranslatef(0.0, -18.0+fantY, 0.0);
+				glRotatef(90, 1.0, 0.0, 0.0);
+				glPushMatrix();
+					glRotatef(gY, 0.0, 0.0, 1.0);
+					fant2.GLrender(NULL, _SHADED, 1.0);
+				glPopMatrix();
+			}
+
+			glPopMatrix();
+			//repertorioCabezas(7.0,-2.0,0.0,1.5,1.5,1.5);
+
 		glPopMatrix();
 		glPushMatrix();
 			glTranslatef(14,-10,10);
@@ -722,22 +1201,27 @@ void display(void)   // Creamos la funcion donde se dibuja
 			fig3.cilindro(4.0,22,50, text2.GLindex);	//Torre derecha
 			//Dragon
 			glPushMatrix();
-			glRotatef(45, 0, 1, 0);
-			glTranslatef(-0.5, 27.05, -12);
-			glScalef(.08, .08, .08);
-			dragon.GLrender(NULL, _SHADED, 1.0);
+				glRotatef(45, 0, 1, 0);
+				glTranslatef(-0.5, 27.05, -12);
+				glScalef(0.08,0.08, 0.08); 
+				glColor3f(0.7, 0.7, 0.7);
+
+				dragon.GLrender(NULL, _SHADED, 1.0);
+
 			glPopMatrix();
 		glPopMatrix();
 		glPushMatrix();
 			glTranslatef(-14, -10, 10);
-			//glColor3f(1.0, 1.0, 0.0);
+			glColor3f(1.0, 1.0, 1.0);
 			fig3.cilindro(4.0, 22, 50, text2.GLindex);	//Torre izquierda
 			//Dragon
 			glPushMatrix();
-			glRotatef(-45, 0, 1, 0);
-			glTranslatef(-0.5, 27.05, -12);
-			glScalef(.08, .08, .08);
-			dragon.GLrender(NULL, _SHADED, 1.0);
+				glRotatef(-45, 0, 1, 0);
+				glTranslatef(-0.5, 27.05, -12);
+				glScalef(.08, .08, .08);
+				glColor3f(0.7, 0.7, 0.7);
+
+				dragon.GLrender(NULL, _SHADED, 1.0);
 			glPopMatrix();
 		glPopMatrix();
 		glPushMatrix();
@@ -746,9 +1230,9 @@ void display(void)   // Creamos la funcion donde se dibuja
 			fig4.cilindro(4.0, 8, 50, text2.GLindex);	//Torre central
 			//Dragon
 			glPushMatrix();
-			glTranslatef(-0.5, 13.7, -14);
-			glScalef(.09, .09, .09);
-			dragon.GLrender(NULL, _SHADED, 1.0);
+				glTranslatef(-0.5, 13.7, -14);
+				glScalef(.09, .09, .09);
+				dragon.GLrender(NULL, _SHADED, 1.0);
 			glPopMatrix();
 		glPopMatrix();
 		//Cuadros de contorno en el edicio central
@@ -763,63 +1247,32 @@ void display(void)   // Creamos la funcion donde se dibuja
 		for (i = 3; i < 20; i += 3)
 		{
 			glPushMatrix();
-			glTranslatef(9, 11.05, 9-i);
-			//glColor3f(1.0, 0.0, 1.0);
-			fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+				glTranslatef(9, 11.05, 9-i);
+				//glColor3f(1.0, 0.0, 1.0);
+				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 			glPopMatrix();
 		}
 		for (i = 3; i < 20; i += 3)
 		{
 			glPushMatrix();
-			glTranslatef(9-i, 11.05, -9);
-			//glColor3f(1.0, 0.0, 1.0);
-			fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+				glTranslatef(9-i, 11.05, -9);
+				//glColor3f(1.0, 0.0, 1.0);
+				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 			glPopMatrix();
 		}
 		for (i = 3; i < 18; i += 3)
 		{
 			glPushMatrix();
-			glTranslatef(-9, 11.05, -9+i);
-			//glColor3f(1.0, 0.0, 1.0);
-			fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
+				glTranslatef(-9, 11.05, -9+i);
+				//glColor3f(1.0, 0.0, 1.0);
+				fig1.prisma(2, 2, 2, text2.GLindex, text2.GLindex, text2.GLindex);
 			glPopMatrix();
 		}
 		//Cuarto 1
 		glPushMatrix();
-		glRotatef(-90, 0, 1, 0);
-		glTranslatef(6.9, -4.8, -6.9);
-		fig6.prisma(10,6,6,text3.GLindex, text2.GLindex, text2.GLindex);
-			//mesa
-			glPushMatrix();
-				mesa(.2, .5, .2, 8, -4.8, -10);
-			glPopMatrix();
-			//cama
-			glPushMatrix();
-				Cama(0.05, 0.2, 0.1, -55, -23, -25);
-			glPopMatrix();
-			//Elevador
-			glPushMatrix();
-			glTranslatef(-6.03, elev, 0);
-			fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
-			glPopMatrix();
-		glPopMatrix();
-		//Cuarto 2
-		glPushMatrix();
-		glRotatef(90, 0, 1, 0);
-		glTranslatef(-6.9, -4.8, -6.9);
-		fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
-			//mesa
-			glPushMatrix();
-				mesa(.2, .5, .2, 8, -4.8, -10);
-			glPopMatrix();
-			//cama
-			glPushMatrix();
-				Cama(0.05, 0.2, 0.1, -55, -23, -25);
-			glPopMatrix();
-			//Cuarto 3
-			glPushMatrix();
-				glTranslatef(6.03, 0, 0);
-				fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
+			glRotatef(-90, 0, 1, 0);
+			glTranslatef(6.9, -4.8, -6.9);
+			fig6.prisma(10,6,6,text3.GLindex, text2.GLindex, text2.GLindex);
 				//mesa
 				glPushMatrix();
 					mesa(.2, .5, .2, 8, -4.8, -10);
@@ -828,6 +1281,37 @@ void display(void)   // Creamos la funcion donde se dibuja
 				glPushMatrix();
 					Cama(0.05, 0.2, 0.1, -55, -23, -25);
 				glPopMatrix();
+				//Elevador
+				glPushMatrix();
+				glTranslatef(-6.03, elev, 0);
+				fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
+				glPopMatrix();
+		glPopMatrix();
+		//Cuarto 2
+		glPushMatrix();
+			glRotatef(90, 0, 1, 0);
+			glTranslatef(-6.9, -4.8, -6.9);
+			fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
+				//mesa
+				glPushMatrix();
+					mesa(.2, .5, .2, 8, -4.8, -10);
+				glPopMatrix();
+				//cama
+				glPushMatrix();
+					Cama(0.05, 0.2, 0.1, -55, -23, -25);
+				glPopMatrix();
+				//Cuarto 3
+				glPushMatrix();
+					glTranslatef(6.03, 0, 0);
+					fig6.prisma(10, 6, 6, text3.GLindex, text2.GLindex, text2.GLindex);
+					//mesa
+					glPushMatrix();
+						mesa(.2, .5, .2, 8, -4.8, -10);
+					glPopMatrix();
+					//cama
+					glPushMatrix();
+						Cama(0.05, 0.2, 0.1, -55, -23, -25);
+					glPopMatrix();
 			glPopMatrix();
 		glPopMatrix();
 		//Cuarto 4
@@ -941,6 +1425,76 @@ void display(void)   // Creamos la funcion donde se dibuja
 
 void animacion()
 {
+	if (play2) {
+		if (estado == 0) {
+			if (traY < 16) {
+				traY += 0.5;
+				
+			}
+			else {
+				estado = 1;
+			}
+				
+		}
+		if (estado == 1) {
+			
+			if (traY > 0) {
+				traY -= 4;
+				//estado = 0;
+			}
+			else {
+				estado = 2;
+			}
+				
+		}
+		if (estado == 2) {
+			if (gAnim<360) {
+				gAnim+=5;
+				fantY+=0.1;
+			}
+			else
+				estado = 3;
+		}
+
+		if (estado == 3) {
+			if (traY < 10.1) {
+				traX-=0.1;
+				traY+=0.1;
+				fantY+=0.1;
+				gY+=5;
+				
+			}
+			else {
+				estado = 4;
+			}
+				
+
+		}
+
+		if (estado == 4) {
+			
+			traX = 0.0;
+			fantY += 0.25;
+			if (traY<=0) {
+				fantY = 0;
+				play2 = false;
+				estado = 0;
+				gY = 0.0;
+			}
+			else {
+				traY-=0.1;
+				gY -=5;
+				traX -= 0.1;
+				
+			}
+				
+
+		}
+
+
+
+
+	}
 	if (fant) {
 		if (fanx >= -8 && fany<=-5) {
 			fanr = 0;
@@ -1135,6 +1689,7 @@ void animacion()
 			z = 0;
 			recorrido = false;
 		}
+		printf("j: %d\nz: %d", j, z);
 	}
 
 	if (play)
@@ -1234,6 +1789,9 @@ void keyboard(unsigned char key, int x, int y)
 	case 'r':
 	case 'R':
 		recorrido = !recorrido;
+		break;
+	case 'z':
+		play2 = true;
 		break;
 	/*case 'l':
 	case 'L':
